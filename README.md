@@ -32,20 +32,20 @@ If you use this code in a scientific publication, please use the following citat
 We recommend using [Conda](https://docs.conda.io/) for managing dependencies.
 
 #### Create and activate the environment
-- `conda create -n se3_trajopt python=3.13`
-- `conda activate se3_trajopt`
+- `conda create -p ./.conda/ python=3.13`
+- `conda activate ./.conda`
 
 #### Install dependencies
-Use `conda install -c "package_name"` to install the following packages:
-  - conda-forge::pinocchio
-  - conda-forge::meshcat-python
-  - conda-forge::cyipopt
-  - conda-forge::example-robot-data
-  - conda-forge::matplotlib
+Use `conda install conda-forge::"package_name"` to install the following packages:
+  - pinocchio
+  - meshcat-python
+  - cyipopt
+  - example-robot-data
+  - matplotlib
 
 ### Usage
 
-- `conda activate se3_trajopt`
+- `conda activate .conda`
 - `export PYTHONPATH=$(pwd)/src`
 - `python src/examples/talos_trajopt.py --vis`
 
