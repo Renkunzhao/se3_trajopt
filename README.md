@@ -8,12 +8,41 @@ The implementation supports whole-body dynamics, contact constraints and terrain
 
 See more at [https://lar.upatras.gr/projects/ibrics.html](https://lar.upatras.gr/projects/ibrics.html).
 
+
+## Results
+The videos below showcase various motions that were generated using the implemented trajectory optimization solver. The code for each particular motion can be found under `src/examples/agile_exps/`.
+
+### Jump
+https://github.com/user-attachments/assets/47698c0f-a3dd-43d8-beb0-040ad7d6c012
+
+### Backflip
+https://github.com/user-attachments/assets/be5b7db3-2185-4c06-8226-fc28839872ab
+
+### Handstand
+https://github.com/user-attachments/assets/fab747f8-0eb0-4b04-819b-5b10ca46a669
+
+### Hopscotch
+https://github.com/user-attachments/assets/f579ce10-0d2a-4a95-9d9b-9fb9b3147b29
+
+### Sideflip
+https://github.com/user-attachments/assets/31e9e250-8758-4190-8677-22f8fd361e7c
+
+### Walk
+https://github.com/user-attachments/assets/eb647602-af8b-4d3d-903f-c3fedc6d0f09
+
+
 ## Maintainers
 
 - Evangelos Tsiatsianas (University of Patras) - etsiatsianas@ac.upatras.gr
 - Konstantinos Chatzilygeroudis (University of Patras) - costashatz@upatras.gr
 
-## Citing our work
+## Publication & Citation
+
+This trajectory optimization solver was developed as part of our research on floating-base space parameterizations for agile whole-body motion planning. The work has been published in:
+
+**A Comparative Study of Floating-Base Space Parameterizations for Agile Whole-Body Motion Planning**  
+*Evangelos Tsiatsianas, Chairi Kiourt, Konstantinos Chatzilygeroudis*  
+IEEE-RAS International Conference on Humanoid Robots (Humanoids), 2025
 
 If you use this code in a scientific publication, please use the following citation:
 
@@ -50,6 +79,10 @@ Use `conda install conda-forge::"package_name"` to install the following package
 - `python src/examples/talos_trajopt.py --vis`
 
 use `--vis` option to visualize the results with meshcat
+
+## Projects using SE3_TrajOpt
+
+- [AHMP](https://github.com/hucebot/ahmp): Motion Planning and Contact Discovery based on Mixed-Distribution Cross-Entropy Method.
 
 ## Acknowledgments
 
