@@ -10,6 +10,9 @@ See more at [https://lar.upatras.gr/projects/ibrics.html](https://lar.upatras.gr
 
 
 ## Results
+
+You can find a video summarizing the approach and results at [https://www.youtube.com/watch?v=zBJSsiUExCw](https://www.youtube.com/watch?v=zBJSsiUExCw).
+
 The videos below showcase various motions that were generated using the implemented trajectory optimization solver. The code for each particular motion can be found under `src/examples/agile_exps/`.
 
 ### Jump
@@ -38,7 +41,7 @@ https://github.com/user-attachments/assets/eb647602-af8b-4d3d-903f-c3fedc6d0f09
 
 ## Publication & Citation
 
-This trajectory optimization solver was developed as part of our research on floating-base space parameterizations for agile whole-body motion planning. The work has been published in:
+This trajectory optimization solver was developed as part of our research on floating-base space parameterizations for agile whole-body motion planning. The work has been published in (also available on [arXiv](https://arxiv.org/abs/2508.11520)):
 
 **A Comparative Study of Floating-Base Space Parameterizations for Agile Whole-Body Motion Planning**  
 *Evangelos Tsiatsianas, Chairi Kiourt, Konstantinos Chatzilygeroudis*  
