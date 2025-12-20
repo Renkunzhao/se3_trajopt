@@ -8,15 +8,10 @@ from nltrajopt.contact_scheduler import ContactScheduler
 from nltrajopt.node import Node
 from nltrajopt.constraint_models import *
 from nltrajopt.cost_models import *
-
-
 from terrain.terrain_grid import TerrainGrid
-
 from robots.talos.TalosWrapper import Talos
 from robots.g1.G1Wrapper import G1
-
 from visualiser.visualiser import TrajoptVisualiser
-
 
 import nltrajopt.params as pars
 

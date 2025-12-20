@@ -3,7 +3,7 @@ import numpy as np  # Linear Algebra
 
 import pinocchio as pin  # Pinocchio library
 
-import example_robot_data
+# import example_robot_data
 
 from pinocchio.robot_wrapper import RobotWrapper
 from pinocchio.shortcuts import buildModelsFromUrdf
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     for i, frame in enumerate(robot.model.frames):
         print(
-            f"Frame {i}: Name = {frame.name}, Type = {frame.type}, Parrent = {frame.parentJoint} "
+            f"Frame {i}: Name = {frame.name}, Type = {frame.type}, Parent = {frame.parentJoint} "
         )
 
     print(robot.model)

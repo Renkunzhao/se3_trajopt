@@ -350,7 +350,7 @@ class NLTrajOpt:
             results.append(result)
         return results
 
-    def save_solution(self, save_name, save_dir: str = "trajopt_solutions_batch"):
+    def save_solution(self, save_name, number = 0, save_dir: str = "trajopt_solutions_batch"):
 
         solution_dict = self.sol_dict
 
@@ -360,7 +360,8 @@ class NLTrajOpt:
 
         # Create a timestamped filename
         timestamp = datetime.now().strftime("%d%m%Y_%H%M%S")
-        filename = f"{save_name}_{timestamp}.json"
+        # filename = f"{save_name}_{timestamp}.json"
+        filename = f"{save_name}_{number}.json"
         filepath = os.path.join(save_dir, filename)
 
         # Prepare data for JSON serialization
