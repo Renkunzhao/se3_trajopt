@@ -246,6 +246,9 @@ class NLTrajOpt:
 
     def intermediate(self, alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, regularization_size, alpha_du, alpha_pr, ls_trials):
         self.iter_count = iter_count
+        if iter_count % 10 == 0:
+            elapsed = time.time() - self._solve_start
+            print(f"  iter {iter_count:4d} | obj={obj_value:.3e} | inf_pr={inf_pr:.2e} | inf_du={inf_du:.2e} | {elapsed:.1f}s", flush=True)
 
     def solve(self, max_iter: int = 1000, tol: float = 1e-4, parallel=True, print_level=3) -> Dict:
         """Solve the optimization problem"""
@@ -261,19 +264,20 @@ class NLTrajOpt:
         )
 
         nlp.add_option("max_iter", max_iter)
-        # nlp.add_option("max_cpu_time", params.MAX_CPU_TIME)
-        nlp.add_option("max_wall_time", params.MAX_CPU_TIME)
+        nlp.add_option("max_cpu_time", params.MAX_CPU_TIME)
         nlp.add_option("print_level", print_level)
         nlp.add_option("jacobian_approximation", "exact")
-        nlp.add_option("nlp_scaling_method", "none")
+        nlp.add_option("nlp_scaling_method", "gradient-based")
         if parallel:
             nlp.add_option("linear_solver", "ma97")
         nlp.add_option("tol", tol)
 
-        nlp.add_option("output_file", "ipopt_output.txt")
+        _ipopt_log = f"ipopt_output_{os.getpid()}.txt"
+        nlp.add_option("output_file", _ipopt_log)
         nlp.add_option("file_print_level", 5)
 
         t0 = time.time()
+        self._solve_start = t0
         self.sol, self.info = nlp.solve(self.x0)
         solve_time = time.time() - t0
 
@@ -289,35 +293,36 @@ class NLTrajOpt:
         ]
         self.evaluation_nums = {}
 
-        # Read and delete the IPOPT log
-        with open("ipopt_output.txt", "r") as f:
-            out_str = f.read()
-            for l in out_str.splitlines():
-                for s in strs:
-                    if s in l and "=" in l:
-                        idx = l.find("=")
-                        if "function evaluations" in s:
-                            s = "func_evals"
-                        elif "gradient evaluations" in s:
-                            s = "grad_evals"
-                        elif "inequality constraint evaluations" in s:
-                            s = "ineq_evals"
-                        elif "equality constraint evaluations" in s:
-                            s = "eq_evals"
-                        elif "inequality constraint Jacobian evaluations" in s:
-                            s = "ineq_jac_evals"
-                        elif "equality constraint Jacobian evaluations" in s:
-                            s = "eq_jac_evals"
-                        self.evaluation_nums[s] = int(l[idx + 1 :].strip())
-                    elif s in l and ":" in l:
-                        idx = l.find(":")
-                        if "Objective" in s:
-                            s = "obj"
-                        if "Constraint" in s:
-                            s = "cons"
-                        vals = [a.strip() for a in l[idx + 1 :].strip().split()]
-                        self.evaluation_nums[s] = float(vals[0])
-        os.remove("ipopt_output.txt")
+        # Some cyipopt/IPOPT builds ignore output_file, so treat the log as optional.
+        if os.path.exists(_ipopt_log):
+            with open(_ipopt_log, "r") as f:
+                out_str = f.read()
+                for l in out_str.splitlines():
+                    for s in strs:
+                        if s in l and "=" in l:
+                            idx = l.find("=")
+                            if "function evaluations" in s:
+                                s = "func_evals"
+                            elif "gradient evaluations" in s:
+                                s = "grad_evals"
+                            elif "inequality constraint evaluations" in s:
+                                s = "ineq_evals"
+                            elif "equality constraint evaluations" in s:
+                                s = "eq_evals"
+                            elif "inequality constraint Jacobian evaluations" in s:
+                                s = "ineq_jac_evals"
+                            elif "equality constraint Jacobian evaluations" in s:
+                                s = "eq_jac_evals"
+                            self.evaluation_nums[s] = int(l[idx + 1 :].strip())
+                        elif s in l and ":" in l:
+                            idx = l.find(":")
+                            if "Objective" in s:
+                                s = "obj"
+                            if "Constraint" in s:
+                                s = "cons"
+                            vals = [a.strip() for a in l[idx + 1 :].strip().split()]
+                            self.evaluation_nums[s] = float(vals[0])
+            os.remove(_ipopt_log)
 
         # Return solution
         self.sol_dict = {
@@ -335,7 +340,7 @@ class NLTrajOpt:
         results = []
         for node in self.nodes:
             result = {
-                "dt": float(sol[node.dt_id]),
+                "dt": float(sol[node.dt_id][0]),
                 "q": reprutils.rep2pin(sol[node.q_id]),
                 "v": sol[node.vq_id],
                 "a": sol[node.aq_id],

@@ -102,3 +102,9 @@ This work was conducted within the [Laboratory of Automation and Robotics](https
 <img src="https://www.upatras.gr/wp-content/uploads/up_2017_logo_en.png" alt="logo_upatras" width="50%"/>
 </p>
 
+```bash
+conda create -p ./.conda/ python=3.13
+conda activate ./.conda
+conda install -c conda-forge pinocchio meshcat-python cyipopt example-robot-data matplotlib
+python src/examples/agile_exps/quad_sideflip.py --vis --output ../TO-MoGen/export/go2_sideflip.csv
+```

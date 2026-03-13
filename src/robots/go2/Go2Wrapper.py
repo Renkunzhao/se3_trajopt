@@ -3,8 +3,6 @@ import numpy as np  # Linear Algebra
 
 import pinocchio as pin  # Pinocchio library
 
-import example_robot_data
-
 from pinocchio.robot_wrapper import RobotWrapper
 from pinocchio.shortcuts import buildModelsFromUrdf
 from pinocchio.visualize import MeshcatVisualizer
