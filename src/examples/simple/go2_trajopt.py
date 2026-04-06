@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+# Allow running this example directly without pre-exporting PYTHONPATH.
+SRC_ROOT = Path(__file__).resolve().parents[2]
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
 import time
 
 import numpy as np

@@ -268,11 +268,13 @@ class NLTrajOpt:
         nlp.add_option("print_level", print_level)
         nlp.add_option("jacobian_approximation", "exact")
         nlp.add_option("nlp_scaling_method", "gradient-based")
-        if parallel:
-            nlp.add_option("linear_solver", "ma97")
+        # if parallel:
+        #     nlp.add_option("linear_solver", "ma97")
         nlp.add_option("tol", tol)
 
-        _ipopt_log = f"ipopt_output_{os.getpid()}.txt"
+        _ipopt_out_dir = os.environ.get("IPOPT_OUTPUT_DIR", ".")
+        os.makedirs(_ipopt_out_dir, exist_ok=True)
+        _ipopt_log = os.path.join(_ipopt_out_dir, f"ipopt_output_{os.getpid()}.txt")
         nlp.add_option("output_file", _ipopt_log)
         nlp.add_option("file_print_level", 5)
 
