@@ -56,10 +56,55 @@ def q_pin_to_row(model: pin.Model, q: np.ndarray) -> np.ndarray:
     return np.hstack([pos, quat, joints])
 
 
+def v_pin_to_row(model: pin.Model, v: np.ndarray) -> np.ndarray:
+    base = v[0:6]
+    joints = np.array(
+        [v[model.joints[model.getJointId(jname)].idx_v] for jname in CSV_JOINT_ORDER]
+    )
+    return np.hstack([base, joints])
+
+
+def tau_to_row(model: pin.Model, tau: np.ndarray) -> np.ndarray:
+    return np.array(
+        [tau[model.joints[model.getJointId(jname)].idx_v] for jname in CSV_JOINT_ORDER]
+    )
+
+
+def _compute_tau(model: pin.Model, data: pin.Data, node: dict) -> np.ndarray:
+    q, v, a = node["q"], node["v"], node["a"]
+    fext = [pin.Force.Zero() for _ in range(model.njoints)]
+    for frame, force in node["forces"].items():
+        frame_id = model.getFrameId(frame)
+        frame_data = model.frames[frame_id]
+        jMf = frame_data.placement
+        f_world = pin.Force(force, np.zeros(3))
+        fext[frame_data.parentJoint] += jMf.act(f_world)
+    pin.forwardKinematics(model, data, q, v, a)
+    pin.updateFramePlacements(model, data)
+    return pin.rnea(model, data, q, v, a, fext)
+
+
 def export_csv(model: pin.Model, nodes: list, output_path: str) -> None:
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    header = "x,y,z,qx,qy,qz,qw," + ",".join(CSV_JOINT_ORDER)
-    rows = np.array([q_pin_to_row(model, node["q"]) for node in nodes])
+    q_cols = ["x", "y", "z", "qx", "qy", "qz", "qw"] + CSV_JOINT_ORDER
+    v_cols = ["vx", "vy", "vz", "wx", "wy", "wz"] + [f"d{j}" for j in CSV_JOINT_ORDER]
+    tau_cols = [f"tau_{j}" for j in CSV_JOINT_ORDER]
+    header = ",".join(q_cols + v_cols + tau_cols)
+
+    data = model.createData()
+    rows = []
+    for node in nodes:
+        tau = _compute_tau(model, data, node)
+        rows.append(
+            np.hstack(
+                [
+                    q_pin_to_row(model, node["q"]),
+                    v_pin_to_row(model, node["v"]),
+                    tau_to_row(model, tau),
+                ]
+            )
+        )
+    rows = np.array(rows)
     np.savetxt(output_path, rows, delimiter=",", header=header, comments="", fmt="%.6f")
     print(f"[TO] 已保存 {len(rows)} 帧 → {output_path}")
 
@@ -93,9 +138,11 @@ def load_config(xml_path: str) -> dict:
         "solution_name":  _text("solution_name"),
         "vis":            _text("vis", "false").lower() in ("true", "1", "yes"),
         # costs (0 = disabled)
-        "w_config":       float(_text("w_config", "0")),
-        "w_velocity":     float(_text("w_velocity", "0")),
-        "w_acceleration": float(_text("w_acceleration", "0")),
+        "w_config":        float(_text("w_config", "0")),
+        "w_velocity":      float(_text("w_velocity", "0")),
+        "w_acceleration":  float(_text("w_acceleration", "0")),
+        "w_flight_config":   float(_text("w_flight_config", "0")),
+        "w_flight_velocity": float(_text("w_flight_velocity", "0")),
     }
 
 
@@ -144,6 +191,8 @@ def run_go2_flip(xml_path: str) -> None:
     )
     # Additional frames for ground-penetration avoidance (p_z >= 0)
     collision_frames = [
+        "base",
+        "FL_hip", "FR_hip", "RL_hip", "RR_hip",
         "FL_calf", "FR_calf", "RL_calf", "RR_calf",
         "FL_thigh", "FR_thigh", "RL_thigh", "RR_thigh",
     ]
@@ -153,7 +202,7 @@ def run_go2_flip(xml_path: str) -> None:
     print("K = ", K)
 
     stages = []
-    for contact_phase_fnames in frame_contact_seq:
+    for k, contact_phase_fnames in enumerate(frame_contact_seq):
         stage_node = Node(
             nv=robot.model.nv,
             contact_phase_fnames=contact_phase_fnames,
@@ -185,6 +234,14 @@ def run_go2_flip(xml_path: str) -> None:
         if cfg["w_acceleration"] > 0:
             stage_node.costs_list.append(
                 JointAccelerationCost(np.zeros(nv_joint), np.eye(nv_joint) * cfg["w_acceleration"])
+            )
+        if cfg["w_flight_config"] > 0 and k1 <= k < k2:
+            stage_node.costs_list.append(
+                ConfigurationCost(q.copy()[7:], np.eye(nq_joint) * cfg["w_flight_config"])
+            )
+        if cfg["w_flight_velocity"] > 0 and k1 <= k < k2:
+            stage_node.costs_list.append(
+                JointVelocityCost(np.zeros(nv_joint), np.eye(nv_joint) * cfg["w_flight_velocity"])
             )
 
         stages.append(stage_node)

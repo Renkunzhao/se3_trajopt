@@ -1,0 +1,32 @@
+<go2_flip>
+    <description>Go2 hop</description>
+    <flip_label>hop</flip_label>
+
+    <!-- rotation: axis 0=roll, 1=pitch, 2=yaw -->
+    <angle_axis>0</angle_axis>
+    <angle_total>0</angle_total>
+
+    <!-- landing target offset -->
+    <target_pos_axis>0</target_pos_axis>
+    <target_delta>0.0</target_delta>
+
+    <!-- phase durations (seconds) -->
+    <pre_flip_t>1.0</pre_flip_t>
+    <flight_t>0.8</flight_t>
+    <land_t>1.0</land_t>
+
+    <!--  -->
+    <w_flight_config>100</w_flight_config>
+    <!-- <w_flight_velocity>1</w_flight_velocity> -->
+
+    <!-- solver -->
+    <dt>0.02</dt>
+    <max_iter>300</max_iter>
+    <tol>1e-3</tol>
+
+    <!-- output -->
+    <output>export/go2_hop-0.8-joint.csv</output>
+    <solution_name>hop</solution_name>
+    <vis>true</vis>
+
+</go2_flip>
