@@ -129,6 +129,8 @@ def load_config(xml_path: str) -> dict:
         "target_pos_axis": int(_text("target_pos_axis")),
         "target_delta":   float(_text("target_delta")),
         "pre_flip_t":     float(_text("pre_flip_t", "1.0")),
+        "twostep_t":       float(_text("twostep_t", "0.0")),
+        "twostep_support": _text("twostep_support", ""),
         "flight_t":       float(_text("flight_t", "0.4")),
         "land_t":         float(_text("land_t", "1.0")),
         "dt":             float(_text("dt", str(DT))),
@@ -175,6 +177,14 @@ def run_go2_flip(xml_path: str) -> None:
     contact_scheduler.add_phase(
         ["l_foot", "r_foot", "l_gripper", "r_gripper"], cfg["pre_flip_t"]
     )
+    twostep_contacts = {
+        "front": ["l_gripper", "r_gripper"],
+        "rear": ["l_foot", "r_foot"],
+    }
+    if cfg["twostep_t"] > 0.0:
+        if cfg["twostep_support"] not in twostep_contacts:
+            raise ValueError("<twostep_support> must be front or rear when <twostep_t> > 0")
+        contact_scheduler.add_phase(twostep_contacts[cfg["twostep_support"]], cfg["twostep_t"])
     k1 = len(contact_scheduler.contact_sequence_fnames)
     contact_scheduler.add_phase([], cfg["flight_t"])
     k2 = len(contact_scheduler.contact_sequence_fnames)

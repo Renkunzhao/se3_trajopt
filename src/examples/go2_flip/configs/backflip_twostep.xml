@@ -1,0 +1,29 @@
+<go2_flip>
+    <description>Go2 twostep backflip</description>
+    <flip_label>backflip_twostep</flip_label>
+
+    <!-- rotation: axis 0=roll, 1=pitch, 2=yaw -->
+    <angle_axis>1</angle_axis>
+    <angle_total>-6.283185307179586</angle_total>
+
+    <!-- landing target offset -->
+    <target_pos_axis>1</target_pos_axis>
+    <target_delta>-0.2</target_delta>
+
+    <!-- phase durations (seconds) -->
+    <pre_flip_t>1.0</pre_flip_t>
+    <twostep_t>0.25</twostep_t>
+    <twostep_support>rear</twostep_support>
+    <flight_t>0.4</flight_t>
+    <land_t>1.0</land_t>
+
+    <!-- solver -->
+    <dt>0.02</dt>
+    <max_iter>250</max_iter>
+    <tol>1e-3</tol>
+
+    <!-- output -->
+    <output>export/go2_backflip_twostep.csv</output>
+    <solution_name>backflip_twostep</solution_name>
+    <vis>true</vis>
+</go2_flip>
